@@ -17,3 +17,4 @@ std::vector<std::string> Input::getVariables() {
 std::string Input::getSize() {
 	return this->size;
 }
+//test git
