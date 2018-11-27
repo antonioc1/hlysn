@@ -1,0 +1,1 @@
+"../../assignment3_testfiles_full/standard tests/hls_test1.c" ../../OutputFile.txt

@@ -1,0 +1,32 @@
+module structural(Clk, Rst, x0, x1, x2, x3, y0, c0, five, ten, d1, d2, e, f, g, h);
+input Int32 x0, x1, x2, x3, y0, c0, five, ten;
+output Int32 d1, d2, e, f, g, h;
+variable Int32 t1, t2, t3, vd1, ve, vf, vg;
+
+ADD #(.DATAWIFTH(Int32)) add_1(x0, x1, t1);
+
+MUL #(.DATAWIFTH(Int32)) mul_1(t1, c0, d1);
+
+MUL #(.DATAWIFTH(Int32)) mul_2(t1, c0, vd1);
+
+MUL #(.DATAWIFTH(Int32)) mul_3(vd1, five, d2);
+
+ADD #(.DATAWIFTH(Int32)) add_2(x1, x2, t2);
+
+ADD #(.DATAWIFTH(Int32)) add_3(x3, c0, t3);
+
+MUL #(.DATAWIFTH(Int32)) mul_4(t2, t3, e);
+
+MUL #(.DATAWIFTH(Int32)) mul_5(t2, t3, ve);
+
+MUL #(.DATAWIFTH(Int32)) mul_6(ve, y0, f);
+
+MUL #(.DATAWIFTH(Int32)) mul_7(ve, y0, vf);
+
+SUB #(.DATAWIFTH(Int32)) sub_1(x0, ten, g);
+
+SUB #(.DATAWIFTH(Int32)) sub_2(x0, ten, vg);
+
+ADD #(.DATAWIFTH(Int32)) add_4(vf, vg, h);
+
+end module
