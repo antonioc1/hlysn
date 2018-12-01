@@ -14,6 +14,7 @@ private:
 	std::string reg;
 	std::string expression;
 	std::vector<std::string> variables;
+
 public:
 	Instruction(std::string reg, std::string expression, std::vector<std::string> variables);
 	std::string getReg();

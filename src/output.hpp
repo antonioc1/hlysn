@@ -8,6 +8,7 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
+#include <cctype>
 
 #include "instruction.hpp"
 #include "input.hpp"
@@ -27,6 +28,7 @@ public:
 	void getInputs(std::string line);
 	void getOutputs(std::string line);
 	void getVariables(std::string line);
+	void getVariablesReg(std::string line);
 	void parseInstruction(std::string line);
 	bool checkOutputs(std::string line);
 	bool checkInputsAndRegs(std::string line);
@@ -35,6 +37,9 @@ public:
 	std::vector<std::string> getInputsAndOutputs();
 	std::string getDatawidth(std::string line);
 	std::string getVariables(Instruction* i);
+	void getVariablesVar(std::string line);
+	std::string getMuxVariables(Instruction* i);
+	std::string getSizes();
 };
 
 #endif

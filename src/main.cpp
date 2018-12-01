@@ -5,12 +5,12 @@
 int main(int argc, char *argv[]) {
 
 	if (argc != 3) {
-		std::cout << "Usage: hlysn inputFile outputFile";
+		std::cout << "Usage: dpgen netlistFile verilogFile";
 	}
 
-	Output HLSM(argv[1], argv[2]);
-	HLSM.ReadFromFile();
-	HLSM.printInstructionsToFile();
+	Output dpgen(argv[1], argv[2]);
+	dpgen.ReadFromFile();
+	dpgen.printInstructionsToFile();
 	return 0;
 }
 

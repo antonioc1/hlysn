@@ -16,8 +16,14 @@ void Output::ReadFromFile(){
 					else if (word == "output") {
 						getOutputs(line);
 					}
-					else if (word == "variable") {
+					else if (word == "wire") {
 						getVariables(line);
+					}
+					else if (word == "register") {
+						getVariablesReg(line);
+					}
+					else if (word == "variable") {
+						getVariablesVar(line);
 					}
 					else {
 						parseInstruction(line);
@@ -25,11 +31,12 @@ void Output::ReadFromFile(){
 				}
 			}
 		}
+        else {
+            std::cout << "input file not found";
+            exit(EXIT_FAILURE);
+        }
 	}
-	else {
-		std::cout << "input file not found";
-		EXIT_FAILURE;
-	}
+	
 }
 
 void Output::getInputs(std::string line) {
@@ -77,6 +84,50 @@ void Output::getOutputs(std::string line) {
 }
 
 void Output::getVariables(std::string line) {
+	std::string word;
+	line.erase(std::remove(line.begin(), line.end(), ','), line.end());
+	std::istringstream iss(line);
+	int counter = 0;
+	std::string size;
+	std::vector<std::string> variables;
+
+	while (iss >> word) {
+		if (counter >= 2) {
+			variables.push_back(word);
+		}
+		else if (counter == 1) {
+			size = word;
+		}
+		counter++;
+	}
+	Input* input = NULL;
+	input = new Input("wire", size, variables);
+	inputs.push_back(input);
+}
+
+void Output::getVariablesReg(std::string line) {
+	std::string word;
+	line.erase(std::remove(line.begin(), line.end(), ','), line.end());
+	std::istringstream iss(line);
+	int counter = 0;
+	std::string size;
+	std::vector<std::string> variables;
+
+	while (iss >> word) {
+		if (counter >= 2) {
+			variables.push_back(word);
+		}
+		else if (counter == 1) {
+			size = word;
+		}
+		counter++;
+	}
+	Input* input = NULL;
+	input = new Input("reg", size, variables);
+	inputs.push_back(input);
+}
+
+void Output::getVariablesVar(std::string line) {
 	std::string word;
 	line.erase(std::remove(line.begin(), line.end(), ','), line.end());
 	std::istringstream iss(line);
@@ -162,6 +213,9 @@ void Output::parseInstruction(std::string line) {
 		}
 		counter++;
 	}
+	if (expression == "") {
+		expression = "=";
+	}
 	Instruction* instruct = NULL;
 	instruct = new Instruction(reg, expression, variables);
 	instructions.push_back(instruct);
@@ -171,7 +225,7 @@ bool Output::checkOutputs(std::string line) {
 
 	for (Input* i : inputs) {
 		//std::cout << i->getType();
-		if (i->getType() == "output" || i->getType() == "variable") {
+		if (i->getType() == "output" || i->getType() == "wire" || i->getType() == "reg" || i->getType() == "variable") {
 			for (std::string j : i->getVariables()) {
 				//std::cout << j;
 				if (j == line) {
@@ -186,7 +240,7 @@ bool Output::checkOutputs(std::string line) {
 bool Output::checkInputsAndRegs(std::string line) {
 	for (Input* i : inputs) {
 		//std::cout << i->getType();
-		if (i->getType() == "input" || i->getType() == "variable") {
+		if (i->getType() == "input" || i->getType() == "wire" || i->getType() == "reg" || i->getType() == "variable") {
 			for (std::string j : i->getVariables()) {
 				//std::cout << j;
 				if (j == line) {
@@ -211,10 +265,12 @@ void Output::printInstructionsToFile() {
 	}
 	else {
 		std::cout << "Output file not found";
-		return;
+		
+		exit(EXIT_FAILURE);
 	}
-
-	_outputFile << "module structural(Clk, Rst, ";
+	
+	_outputFile << "`timescale 1ns / 1ps \n";
+	_outputFile << "module dpgen (Clk, Rst, ";
 
 	std::vector<std::string> variables = getInputsAndOutputs();
 
@@ -227,10 +283,22 @@ void Output::printInstructionsToFile() {
 		}
 	}
 
-	_outputFile << ");\n";
+	_outputFile << ");\n\n";
+
+	_outputFile << getSizes();
+
+	_outputFile << "\n";
+	_outputFile << "input Clk, Rst;\n";
 
 	for (Input* i : inputs) {
-		_outputFile << i->getType() + " " + i->getSize() + " ";
+		std::string size = i->getSize();
+		size.erase(remove_if(size.begin(), size.end(), [](char c) { return !isalpha(c); }), size.end());
+		if (size == "UInt") {
+			_outputFile << i->getType() + " [" + i->getSize() + "-1:0] ";
+		}
+		else {
+			_outputFile << i->getType() + " signed [" + i->getSize() + "-1:0] ";
+		}
 		std::vector<std::string> variables = i->getVariables();
 		for (int i = 0; i < variables.size(); i++) {
 			if (i != (variables.size() - 1)) {
@@ -245,58 +313,72 @@ void Output::printInstructionsToFile() {
 	_outputFile << "\n";
 
 	int counter = 0;
+	std::string line;
 	for (Instruction* i : instructions) {
+		std::string sign = getDatawidth(i->getReg());
+		sign.erase(remove_if(sign.begin(), sign.end(), [](char c) { return !isalpha(c); }), sign.end());
+
+		if (sign == "Int") {
+			line = "S";
+		}
+		else {
+			line = "";
+		}
+
 		if (i->getExpression() == "+") {
 			nums[0]++;
-			_outputFile << "ADD #(.DATAWIFTH(" << getDatawidth(i->getReg()) << ")) add_" << nums[0] << "(" << getVariables(i) << ");\n\n";
+			_outputFile << line << "ADD #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) add_" << nums[0] << "(" << getVariables(i) << i->getReg() << ");\n\n";
 		}
 		else if (i->getExpression() == "-") {
 			nums[1]++;
-			_outputFile << "SUB #(.DATAWIFTH(" << getDatawidth(i->getReg()) << ")) sub_" << nums[1] << "(" << getVariables(i) << ");\n\n";
+			_outputFile << line << "SUB #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) sub_" << nums[1] << "(" << getVariables(i) << i->getReg() << ");\n\n";
 		}
 		else if (i->getExpression() == "==") {
 			nums[2]++;
-			_outputFile << "COMP #(.DATAWIFTH(" << getDatawidth(i->getReg()) << ")) comp_" << nums[2] << "(" << "\"eq\", " << getVariables(i) << ");\n\n";
+			_outputFile << line << "COMP #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) comp_" << nums[2] << "(" << getVariables(i) << "0, 0, " <<  i->getReg() << ");\n\n";
 		}
 		else if (i->getExpression() == "<") {
 			nums[2]++;
-			_outputFile << "COMP #(.DATAWIFTH(" << getDatawidth(i->getReg()) << ")) comp_" << nums[2] << "(" << "\"lt\", " << getVariables(i) << ");\n\n";
+			_outputFile << line << "COMP #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) comp_" << nums[2] << "(" << getVariables(i) << "0, " << i->getReg() << ", 0);\n\n";
 		}
 		else if (i->getExpression() == ">") {
 			nums[2]++;
-			_outputFile << "COMP #(.DATAWIFTH(" << getDatawidth(i->getReg()) << ")) comp_" << nums[2] << "(" << "\"gt\", " << getVariables(i) << ");\n\n";
+			_outputFile << line << "COMP #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) comp_" << nums[2] << "(" << getVariables(i) << i->getReg() <<", 0, 0);\n\n";
 		}
 		else if (i->getExpression() == "<<") {
 			nums[3]++;
-			_outputFile << "SHL #(.DATAWIFTH(" << getDatawidth(i->getReg()) << ")) shl_" << nums[3] << "(" << getVariables(i) << ");\n\n";
+			_outputFile << line << "SHL #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) shl_" << nums[3] << "(" << getVariables(i) << i->getReg() << ");\n\n";
 		}
 		else if (i->getExpression() == ">>") {
 			nums[4]++;
-			_outputFile << "SHR #(.DATAWIFTH(" << getDatawidth(i->getReg()) << ")) shr_" << nums[4] << "(" << getVariables(i) << ");\n\n";
+			_outputFile << line << "SHR #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) shr_" << nums[4] << "(" << getVariables(i) << i->getReg() << ");\n\n";
 		}
+
+		// FIX ME : MUX
+
 		else if (i->getExpression() == "?") {
 			nums[5]++;
-			_outputFile << "MUX2x1 #(.DATAWIFTH(" << getDatawidth(i->getReg()) << ")) mux2x1_" << nums[5] << "(" << getVariables(i) << ");\n\n";
+			_outputFile << line << "MUX2x1 #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) mux2x1_" << nums[5] << "(" << getMuxVariables(i) << i->getReg() << ");\n\n";
 		}
 		else if (i->getExpression() == "*") {
 			nums[6]++;
-			_outputFile << "MUL #(.DATAWIFTH(" << getDatawidth(i->getReg()) << ")) mul_" << nums[6] << "(" << getVariables(i) << ");\n\n";
+			_outputFile << line << "MUL #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) mul_" << nums[6] << "(" << getVariables(i) << i->getReg() << ");\n\n";
 		}
-		else if (i->getExpression() == "<<") {
+		else if (i->getExpression() == "=") {
 			nums[7]++;
-			_outputFile << "REG #(.DATAWIFTH(" << getDatawidth(i->getReg()) << ")) reg_" << nums[7] << "(Clk, Rst, " << getVariables(i) << ");\n\n";
+			_outputFile << line << "REG #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) reg_" << nums[7] << "(" << getVariables(i) << "Clk, Rst, " << i->getReg() <<");\n\n";
 		}
 		else if (i->getExpression() == "/") {
 			nums[8]++;
-			_outputFile << "DIV #(.DATAWIFTH(" << getDatawidth(i->getReg()) << ")) div_" << nums[8] << "(" << getVariables(i) << ");\n\n";
+			_outputFile << line << "DIV #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) div_" << nums[8] << "(" << getVariables(i) << ");\n\n";
 		}
 		else if (i->getExpression() == "%") {
 			nums[9]++;
-			_outputFile << "MOD #(.DATAWIFTH(" << getDatawidth(i->getReg()) << ")) mod_" << nums[9] << "(" << getVariables(i) << ");\n\n";
+			_outputFile << line << "MOD #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) mod_" << nums[9] << "(" << getVariables(i) << ");\n\n";
 		}
 
 	}
-	_outputFile << "end module";
+	_outputFile << "endmodule";
 }
 
 std::vector<std::string> Output::getInputsAndOutputs() {
@@ -330,8 +412,84 @@ std::string Output::getVariables(Instruction * i) {
 	std::vector<std::string> variables = i->getVariables();
 	
 	for (int j = 0; j < variables.size(); j++) {
+		/*
+		if (j != (variables.size() - 1)) {
+			line = line + variables[j] + ", ";
+		}
+		else {
+			line = line + variables[j];
+		}
+		*/
 		line = line + variables[j] + ", ";
 	}
-	line = line + i->getReg();
+
 	return line;
 }
+
+std::string Output::getMuxVariables(Instruction* i) {
+	std::string line = "";
+	std::vector<std::string> variables = i->getVariables();
+	std::string selector;
+
+	for (int j = 0; j < variables.size(); j++) {
+		/*
+		if (j != (variables.size() - 1)) {
+			line = line + variables[j] + ", ";
+		}
+		else {
+			line = line + variables[j];
+		}
+		*/
+		if (j == 0) {
+			selector = variables[j];
+		}
+		else {
+			line = line + variables[j] + ", ";
+		}
+	}
+	line = line + selector + ", ";
+	return line;
+}
+
+std::string Output::getSizes() {
+	bool flag;
+	std::vector<std::string> currentSizes;
+	std::string line;
+	std::string size;
+	std::string output = "";
+
+	for (Input* i : inputs) {
+		if (currentSizes.size() == 0) {
+			currentSizes.push_back(i->getSize());
+		}
+		else {
+			for (int j = 0; j < currentSizes.size(); j++) {
+				if (currentSizes[j] == i->getSize()) {
+					flag = false;
+					break;
+				}
+				else {
+					flag = true;
+				}
+			}
+			if (flag != false) {
+				currentSizes.push_back(i->getSize());
+			}
+		}
+	}
+	for (int i = 0; i < currentSizes.size(); i++) {
+		line = currentSizes[i];
+		size = currentSizes[i];
+		line.erase(remove_if(line.begin(), line.end(), [](char c) { return !isalpha(c); }), line.end());
+		if (line == "Int") {
+			size.erase(0, 3);
+			output = output + "parameter " + currentSizes[i] + " = " + size + ";\n";
+		}
+		else if(line == "UInt") {
+			size.erase(0, 4);
+			output = output + "parameter " + currentSizes[i] + " = " + size + ";\n";
+		}
+	}
+	return output;
+}
+
