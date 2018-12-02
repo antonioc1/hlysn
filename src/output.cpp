@@ -183,21 +183,21 @@ void Output::parseInstruction(std::string line) {
 			else if (counter == 3) {
 				if (checkExpression(word) != false) {
 					expression = word;
-                    if (word == ">") {
-                        std::size_t found = line.find(">");
-                        if (found!=std::string::npos)
-                            std::cout << "create reg for > " << found << '\n';
-                    }
-                    else if (word == "<") {
-                        std::size_t found = line.find("<");
-                        if (found!=std::string::npos)
-                            std::cout << "create reg for < " << found << '\n';
-                    }
-                    else if (word == "=") {
-                        std::size_t found = line.find("=");
-                        if (found!=std::string::npos)
-                            std::cout << "create reg for = " << found << '\n';
-                    }
+//                    if (word == ">") {
+//                        std::size_t found = line.find(">");
+//                        if (found!=std::string::npos)
+//                            std::cout << "create reg for > " << found << '\n';
+//                    }
+//                    else if (word == "<") {
+//                        std::size_t found = line.find("<");
+//                        if (found!=std::string::npos)
+//                            std::cout << "create reg for < " << found << '\n';
+//                    }
+//                    else if (word == "=") {
+//                        std::size_t found = line.find("=");
+//                        if (found!=std::string::npos)
+//                            std::cout << "create reg for = " << found << '\n';
+//                    }
 				}
 				else {
 					//error: expression not found

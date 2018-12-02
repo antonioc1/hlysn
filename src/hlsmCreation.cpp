@@ -99,8 +99,8 @@ void HLSM::printStates(Output *dpgen){
     
     for (int i = 1; i <= latCon; i++) {
         _outputFile << "state_" << i <<" : begin\n";
-        // create function to find which thig to print here
-        _outputFile << "Some logic goes here for state "<< i << "\n";
+        // create function to find which thing to print here
+        _outputFile << "Some logic goes here for state "<< i << "\n"; // change to print the statment that comes next according to list_R
         
         if (i+1 > latCon) {
             _outputFile << "state <= Final ;\n";
@@ -120,5 +120,6 @@ void HLSM::printStates(Output *dpgen){
     _outputFile << "end\n";
     
     _outputFile << "\n\nend\n";
+    _outputFile << "\n\nendmodule\n";
 
 }
