@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     HLSM highlevel(argv[1], argv[3], latency);
     Output dpgen(argv[1], argv[3], latency);
     dpgen.ReadFromFile();
-//    dpgen.printInstructionsToFile();
+   // dpgen.printInstructionsToFile();
     highlevel.printStates(&dpgen);
     
 
