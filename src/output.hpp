@@ -21,9 +21,10 @@ private:
 	char *_filename, *_filename2;
 	std::ifstream _inputFile;
 	std::ofstream _outputFile;
+    int latenecyCons = 0;
 public:
 	Output() {};
-	Output(char *filename, char *filename2) : _filename(filename), _filename2(filename2) {};
+    Output(char *filename, char *filename2, int latenecy) : _filename(filename), _filename2(filename2), latenecyCons(latenecy) {};
 	void ReadFromFile();
 	void getInputs(std::string line);
 	void getOutputs(std::string line);

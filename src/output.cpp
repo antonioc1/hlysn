@@ -32,6 +32,7 @@ void Output::ReadFromFile(){
 			}
 		}
         else {
+            std::cout << _filename << "\n";
             std::cout << "input file not found";
             exit(EXIT_FAILURE);
         }
@@ -270,7 +271,7 @@ void Output::printInstructionsToFile() {
 	}
 	
 	_outputFile << "`timescale 1ns / 1ps \n";
-	_outputFile << "module dpgen (Clk, Rst, ";
+	_outputFile << "module HLSM (Clk, Rst, Start, Done, ";
 
 	std::vector<std::string> variables = getInputsAndOutputs();
 
@@ -288,7 +289,8 @@ void Output::printInstructionsToFile() {
 	_outputFile << getSizes();
 
 	_outputFile << "\n";
-	_outputFile << "input Clk, Rst;\n";
+	_outputFile << "input Clk, Rst, Start;\n";
+    _outputFile << "output reg Done;\n";
 
 	for (Input* i : inputs) {
 		std::string size = i->getSize();
