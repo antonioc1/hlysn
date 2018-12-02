@@ -17,6 +17,10 @@
 #include <algorithm>
 #include <string>
 #include <math.h>
+#include "output.hpp"
+#include "input.hpp"
+
+
 
 using namespace std;
 
@@ -29,7 +33,7 @@ private:
     
 public:
     HLSM(char *filename, char *filename2,int latency) : latCon(latency), _filename(filename), _filename2(filename2){};
-    void printStates();
+    void printStates(Output *dpgen);
     
 };
 

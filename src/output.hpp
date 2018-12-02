@@ -41,6 +41,7 @@ public:
 	void getVariablesVar(std::string line);
 	std::string getMuxVariables(Instruction* i);
 	std::string getSizes();
+    std::vector<Input*> getinputs(){return inputs;}
 };
 
 #endif

@@ -7,7 +7,8 @@
 
 #include "hlsmCreation.hpp"
 
-void HLSM::printStates(){
+
+void HLSM::printStates(Output *dpgen){
     if (_filename2 != NULL) {
         _outputFile.open(_filename2);
     }
@@ -17,6 +18,49 @@ void HLSM::printStates(){
         exit(EXIT_FAILURE);
     }
     int bitNumforState = int(log2(latCon)+1);;
+    
+    _outputFile << "`timescale 1ns / 1ps \n\n\n\n";
+    _outputFile << "module HLSM (Clk, Rst, Start, Done, ";
+    
+    std::vector<std::string> variables = dpgen->getInputsAndOutputs();
+    
+    for (int i = 0; i < variables.size(); i++) {
+        if (i != (variables.size() - 1)) {
+            _outputFile << variables[i] + ", ";
+        }
+        else {
+            _outputFile << variables[i];
+        }
+    }
+    
+    _outputFile << ");\n\n";
+    
+    _outputFile << "input Clk, Rst, Start;\n";
+    _outputFile << "output reg Done;\n";
+    
+    for (Input* i : dpgen->getinputs()) {
+        std::string size = i->getSize();
+        size.erase(remove_if(size.begin(), size.end(), [](char c) { return !isalpha(c); }), size.end());
+        if (size == "UInt") {
+            _outputFile << i->getType() + " [" + i->getSize() + "-1:0] ";
+        }
+        else {
+            _outputFile << i->getType() + " signed [" + i->getSize() + "-1:0] ";
+        }
+        std::vector<std::string> variables = i->getVariables();
+        for (int i = 0; i < variables.size(); i++) {
+            if (i != (variables.size() - 1)) {
+                _outputFile << variables[i] + ", ";
+            }
+            else {
+                _outputFile << variables[i] + ";\n";
+            }
+        }
+    }
+        
+    _outputFile << "\n";
+    
+    
     
     _outputFile << "reg ["<< bitNumforState << ":0] state ;\n";
     _outputFile << "parameter stateStart = 0;\n";
@@ -45,6 +89,20 @@ void HLSM::printStates(){
     _outputFile << "end\n";
     
     // write generic case creation here
+    
+    for (int i = 1; i <= latCon; i++) {
+        _outputFile << "state_" << i <<" : begin\n";
+        // create function to find which thig to print here
+        _outputFile << "Some logic goes here for state "<< i << "\n";
+        
+        if (i+1 > latCon) {
+            _outputFile << "state <= Final ;\n";
+        }
+        else{
+            _outputFile << "state <= state_" << i+1 <<" ;\n";
+        }
+        _outputFile << "end\n";
+    }
     
     
     _outputFile << "Final : begin\n";

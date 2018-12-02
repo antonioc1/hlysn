@@ -1,3 +1,16 @@
+`timescale 1ns / 1ps 
+
+
+
+module HLSM (Clk, Rst, Start, Done, a, b, c, z, x);
+
+input Clk, Rst, Start;
+output reg Done;
+input [UInt16-1:0] a, b, c;
+output [UInt8-1:0] z;
+output [UInt16-1:0] x;
+variable [UInt8-1:0] d, e, f, g;
+
 reg [2:0] state ;
 parameter stateStart = 0;
 parameter state_1= 1;
@@ -19,6 +32,18 @@ end
 else begin
 state <= stateStart ;
 end
+end
+state_1 : begin
+Some logic goes here for state 1
+state <= state_2 ;
+end
+state_2 : begin
+Some logic goes here for state 2
+state <= state_3 ;
+end
+state_3 : begin
+Some logic goes here for state 3
+state <= Final ;
 end
 Final : begin
 Done <= 1 ;
