@@ -20,6 +20,15 @@ parameter stateFinish = 4;
 
 always@ (posedge Clk) begin 
 if (Rst == 1) begin
+a <= 0 
+b <= 0 
+c <= 0 
+z <= 0 
+x <= 0 
+d <= 0 
+e <= 0 
+f <= 0 
+g <= 0 
 state <= stateStart;
 end
 

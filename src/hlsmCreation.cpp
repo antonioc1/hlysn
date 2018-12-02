@@ -74,6 +74,13 @@ void HLSM::printStates(Output *dpgen){
     
     _outputFile << "always@ (posedge Clk) begin \n";
     _outputFile << "if (Rst == 1) begin\n";
+    for (Input* i : dpgen->getinputs()) {
+        std::string size = i->getSize();
+    std::vector<std::string> variables = i->getVariables();
+    for (int i = 0; i < variables.size(); i++) {
+        _outputFile << variables[i] << " <= 0 ;\n";
+    }
+    }
     _outputFile << "state <= stateStart;\n";
     _outputFile << "end\n\n";
     
