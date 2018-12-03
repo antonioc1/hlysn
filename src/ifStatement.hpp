@@ -30,5 +30,9 @@ public:
     ifStatement(std::string word,std::string inIfState, bool elsestate, std::string inElseState) : condition(word), inIf(inIfState), elseStatement(elsestate), inElse(inIfState) {};
 };
 
+<<<<<<< refs/remotes/origin/master
 //test
+=======
+
+>>>>>>> added ifStatemtn files
 #endif /* ifStatement_hpp */
