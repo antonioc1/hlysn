@@ -77,15 +77,45 @@ void Equation::setEqReliance(std::vector<std::string> newReliance){
     this->eqReliance = newReliance;
 }
 
+void Equation::pushBackReliance(std::string r){
+    this->eqReliance.push_back(r);
+}
+
 void Equation::setEqRelianceSize(int newRSize){
     this->eqRelianceSize = newRSize;
 }
 
 std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff){
+    int i = 0;
+    int j = 0;
+    int k = 0; 
+
     vector<Equation::Equation> sortedEq;
 
-
     //sort through list and assign latency based on operator
+    for(i ; i<= sortedEq.size(); i++){
+        if(sortedEq[i].getEqOperator() == "*"){ //if given equation is multiplication 
+            sortedEq[i].setEqLatency(2);
+        }
+        else if(sortedEq[i].getEqOperator() == "/" || sortedEq[i].getEqOperator() == "%"){//if given equation is divider/modulo
+            sortedEq[i].setEqLatency(3);
+        }
+        else{//all other resources
+            sortedEq[i].setEqLatency(1);
+        }
+    }
+
+    //set reliance 
+    for(i = sortedEq.size(); i > 0; i--){
+        for(j = 0; j < sortedEq.size(); j++){//is this right? can't remember if it's < or <=
+            for(k = 0; k < sortedEq[j].getEqInput().size ; k++){
+                if(sortedEq[i].getEqOutput() == sortedEq[j].getEqInput()[k]){//does this work?
+                    sortedEq[i].pushBackReliance(sortedEq[j].getEqInput()[k]);
+                }        
+            }
+        }
+    }    
+
     //ALAP
 
 

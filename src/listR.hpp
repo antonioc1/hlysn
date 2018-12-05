@@ -40,6 +40,8 @@ class Equation {
         void setEqReliance(std::vector<std::string> newReliance);
         void setEqRelianceSize(int newRSize);
 
+        void Equation::pushBackReliance(std::string r);
+
         //listR
         std::vector<Equation::Equation> listRSort();
 
