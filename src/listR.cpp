@@ -85,7 +85,7 @@ void Equation::setEqRelianceSize(int newRSize){
     this->eqRelianceSize = newRSize;
 }
 
-std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff){
+std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff, int globalLatency){
     int i = 0;
     int j = 0;
     int k = 0; 
@@ -95,7 +95,8 @@ std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff){
 
     vector<Equation::Equation> sortedEq;
     vector<Equation::Equation> alapEqList;
-    //clear both sortedEq and alapEqList to prevent pointer issues 
+    vector<Equation::Equation> readyList;
+    //clear all initiated vectors to prevent pointer issues 
 
     //sort through list and assign latency based on operator
     for(i ; i<= sortedEq.size(); i++){
@@ -166,7 +167,22 @@ std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff){
     }
     //alap portion of ListR completed
 
-    
+    //if global latency request < cnt, send error message about latency
+
+    //List-R
+
+    if(cnt < globalLatency){ //check difference between required latency and global latency to shift down for List-R implementation 
+        cnt = globalLatency - cnt;
+    }
+
+    for(i=1; i < globalLatency; i++){
+        for(j = 0; j < sortedEq.size(); j++){
+            if(sortedEq[j].getALAP() >= globalLatency){ //how do I sort out the reliance portion? only added to readyList if alap right and available (slack use?)
+                readyList.push_back(sortedEq[j]);
+            }
+        }
+    } 
+
 
     return sortedEq;
 }

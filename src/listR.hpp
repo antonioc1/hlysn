@@ -43,7 +43,7 @@ class Equation {
         void Equation::pushBackReliance(std::string r);
 
         //listR
-        std::vector<Equation::Equation> listRSort();
+        std::vector<Equation::Equation> listRSort(std::vector<Equation> inputStuff, int globalLatency);
 
 };       
 
