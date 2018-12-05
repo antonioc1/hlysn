@@ -89,8 +89,13 @@ std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff){
     int i = 0;
     int j = 0;
     int k = 0; 
+    int t = 0;
+    int cnt = 0;
+    int flag = 0; 
 
     vector<Equation::Equation> sortedEq;
+    vector<Equation::Equation> alapEqList;
+    //clear both sortedEq and alapEqList to prevent pointer issues 
 
     //sort through list and assign latency based on operator
     for(i ; i<= sortedEq.size(); i++){
@@ -116,9 +121,52 @@ std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff){
         }
     }    
 
-    //ALAP
+    //ALAP (but the times locations will be backwards)
+    for(i = sortedEq.size(); i > 0; i--){
+        if(i == sortedEq.size()){//condition for first equation 
+            t = 1;
+            sortedEq[i].setALAP(t);
+            alapEqList.push_back(sortedEq[i]);
+        }
+        else{
+            //if equation is in reliance array of already sorted equations update alap
+            for(j = 0; j < alapEqList.size(); j++){//go through already sorted equations
+                for(k = 0; k < alapEqList[j].getEqInput().size(); k++){ //check each equations inputs
+                    if(sortedEq[i].getEqOutput() == alapEqList[j].getEqInput()[k]){ //if the output of the current eqation is an input of a lower equation
+                        if(flag > 0); //check if the flag was previously set
+                        else{
+                            flag = j; //otherwise mark the flag to reference for the new alap of the current eq
+                        }
+                    }
+                }
+            }
+            if(flag == 0){ //if no reliance is found then put eq in lowest level
+                t = 1;
+                sortedEq[i].setALAP(t);
+                alapEqList.push_back(sortedEq[i]);
+            }
+            else{
+                t = alapEqList[j].getALAP() + sortedEq[i].getEqLatency(); //take the time of the reliant node and the latency of the current node to find it's time
+                sortedEq[i].setEqLatency(t);
+                alapEqList.push_back(sortedEq[i]);
+                if(t > cnt){
+                    cnt = t; //updating the largest depth
+                }
+            }
+        }
+        flag = 0;
+    }
 
+    sortedEq = alapEqList;
+    //then clear the alapEqList; 
 
+    for(i = 0; i < sortedEq.size(); i++){ //set alap in the right latency order
+        t = sortedEq[i].getALAP() - 1;
+        sortedEq[i].setALAP((cnt - t));
+    }
+    //alap portion of ListR completed
+
+    
 
     return sortedEq;
 }
