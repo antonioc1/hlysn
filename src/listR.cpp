@@ -1,3 +1,6 @@
+//Colter Ogden
+//jcogden
+
 #include <iostream>
 #include <cstring>
 #include <vector>
@@ -5,10 +8,11 @@
 
 using namespace std;
 
-Equation::Equation(int iD, int latency, int lap, std::string operate, std::vector<std::string> input, std::vector<std::string> reliance, int relianceSize){
+Equation::Equation(int iD, int latency, int lap, int lack, std::string operate, std::vector<std::string> input, std::vector<std::string> reliance, int relianceSize){
     this->iD = iD;
     this->eqLatency = latency;
     this->aLAP = lap;
+    this->slack = lack;
     this->eqOperator = operate;
     this->eqInput = input;
     this->eqReliance = reliance;
@@ -26,6 +30,10 @@ int Equation::getEqLatency(){
 
 int Equation::getALAP(){
     return this->aLAP;
+}
+
+int Equation::getSlack(){
+    return this->slack;
 }
 
 std::string Equation::getEqOutput(){
@@ -59,6 +67,10 @@ void Equation::setEqLatency(int newLatency){
 
 void Equation::setALAP(int lap){
     this->aLAP = lap;
+}
+
+void Equation::setSlack(int lap){
+    this->slack = lap;
 }
 
 void Equation::setEqOutput(std::string newOutput){
@@ -122,7 +134,7 @@ std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff, int globa
         }
     }    
 
-    //ALAP (but the times locations will be backwards)
+    //ALAP Sort ------------------------------------------------------------------------------------------------------------
     for(i = sortedEq.size(); i > 0; i--){
         if(i == sortedEq.size()){//condition for first equation 
             t = 1;
@@ -165,24 +177,28 @@ std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff, int globa
         t = sortedEq[i].getALAP() - 1;
         sortedEq[i].setALAP((cnt - t));
     }
-    //alap portion of ListR completed
+    //alap portion of ListR completed------------------------------------------------------------------------------------------------------------
 
     //if global latency request < cnt, send error message about latency
+    if(globalLatency > cnt){
+        cout << "Latency requested is not achievable with this netlist";
+    }
 
-    //List-R
-
+    //Start ALAP to List-R------------------------------------------------------------------------------------------------------------
     if(cnt < globalLatency){ //check difference between required latency and global latency to shift down for List-R implementation 
         cnt = globalLatency - cnt;
     }
 
-    for(i=1; i < globalLatency; i++){
-        for(j = 0; j < sortedEq.size(); j++){
-            if(sortedEq[j].getALAP() >= globalLatency){ //how do I sort out the reliance portion? only added to readyList if alap right and available (slack use?)
-                readyList.push_back(sortedEq[j]);
-            }
-        }
-    } 
+    for(i = 1; i <= globalLatency; i++){
+        //for each variable list, if reliance = null, it's ready to go remove reliance once something has been put on the list. 
+        //remember latency (how long each takes) maybe on latency have a "when i = latency time required" remove from reliance lists 
 
+        for(j = 0; j < sortedEq.size(); j++){//set slack of remaining  each time
+            t = sortedEq[j].getALAP() - i;
+
+        }
+
+    }
 
     return sortedEq;
 }
