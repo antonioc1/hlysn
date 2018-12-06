@@ -40,9 +40,11 @@ public:
 class State{
 private:
     string name;
+    vector<State*> prevStates;
+    vector<State*> nextStates;
     
 public:
-    
+    void createStates();
 };
 
 

@@ -22,19 +22,13 @@ class ifStatement {
 private:
     std::string condition;
     bool elseStatement = false;
-    std::vector<std::string> inIf;
-    std::vector<std::string> inElse;
-    ifStatement* nested = NULL;
+    std::string inIf;
+    std::string inElse;
 public:
     ifStatement() {};
-    void setCondition(std::string word){condition = word;}
-    void setInIf(std::string word){inIf.push_back(word);}
-    void setInElse(std::string word){inElse.push_back(word);}
-    void setElseStatement(){elseStatement = true;}
-    void setNestedIf(ifStatement* nestedpointer){nested = nestedpointer;}
-
+    ifStatement(std::string word, std::string inIfState) : condition(word), inIf(inIfState) {};
+    ifStatement(std::string word,std::string inIfState, bool elsestate, std::string inElseState) : condition(word), inIf(inIfState), elseStatement(elsestate), inElse(inIfState) {};
 };
-//test2
 
 //test
 #endif /* ifStatement_hpp */

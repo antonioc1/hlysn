@@ -6,4 +6,3 @@
 //
 
 #include "ifStatement.hpp"
-//test

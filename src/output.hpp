@@ -9,9 +9,11 @@
 #include <iostream>
 #include <algorithm>
 #include <cctype>
+#include <string>
 
 #include "instruction.hpp"
 #include "input.hpp"
+#include "ifStatement.hpp"
 
 class Output {
 private:
@@ -21,10 +23,12 @@ private:
 	char *_filename, *_filename2;
 	std::ifstream _inputFile;
 	std::ofstream _outputFile;
-    int latenecyCons = 0;
+    std::vector<ifStatement*> ifStatements;
+    
+    
 public:
 	Output() {};
-    Output(char *filename, char *filename2, int latenecy) : _filename(filename), _filename2(filename2), latenecyCons(latenecy) {};
+    Output(char *filename, char *filename2, int latenecy) : _filename(filename), _filename2(filename2) {};
 	void ReadFromFile();
 	void getInputs(std::string line);
 	void getOutputs(std::string line);
@@ -42,6 +46,11 @@ public:
 	std::string getMuxVariables(Instruction* i);
 	std::string getSizes();
     std::vector<Input*> getinputs(){return inputs;}
+    void createIfStatement(std::string line);
+    ifStatement* getLastifState(){return ifStatements.back();}
+    
 };
+
+
 
 #endif

@@ -14,6 +14,9 @@ int main(int argc, char *argv[]) {
     Output dpgen(argv[1], argv[3], latency);
     dpgen.ReadFromFile();
    // dpgen.printInstructionsToFile();
+    // create States here
+    // list r here
+    
     highlevel.printStates(&dpgen);
     
 

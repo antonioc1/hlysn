@@ -25,6 +25,16 @@ void Output::ReadFromFile(){
 					else if (word == "variable") {
 						getVariablesVar(line);
 					}
+                    else if (word == "if") {
+                        createIfStatement(line); //Fix
+                        
+                        
+                    }
+                    else if (word == "else") {
+                        createIfStatement(line); //Fix
+                        
+                        
+                    }
 					else {
 						parseInstruction(line);
 					}
@@ -39,6 +49,66 @@ void Output::ReadFromFile(){
 	}
 	
 }
+
+void Output::createIfStatement(std::string line){
+    std::size_t foundif = line.find("if");
+    if (foundif!=std::string::npos) {
+        
+    
+    ifStatement* ifState = new ifStatement();
+    line.erase(std::remove(line.begin(), line.end(), '{'), line.end());
+    ifState->setCondition(line);
+    std::getline(_inputFile, line);
+    while (1) {
+        std::size_t foundif = line.find("if");
+        std::size_t foundelse = line.find("else");
+        std::size_t foundbracket = line.find("}");
+        if (foundif!=std::string::npos){
+            line.erase(std::remove(line.begin(), line.end(), '\t'), line.end());
+            std::cout << "nested if\n";
+            createIfStatement(line);
+            ifStatement* last = this->getLastifState();
+            ifState->setNestedIf(last);
+            std::getline(_inputFile, line);
+        }
+        else if (foundelse!=std::string::npos) {
+            ifStatement* lastIf = this->getLastifState();
+            std::getline(_inputFile, line);
+            lastIf->setInElse(line);
+            lastIf->setElseStatement();
+            std::getline(_inputFile, line);
+        }
+        else if (foundbracket!=std::string::npos){
+//            std::getline(_inputFile, line);
+//            std::size_t foundelse = line.find("else");
+//            if (foundelse!=std::string::npos) {
+//                ifState->setInElse(line);
+//            }
+                break;
+        }
+        else{
+            line.erase(std::remove(line.begin(), line.end(), '\t'), line.end());
+            ifState->setInIf(line);
+            std::getline(_inputFile, line);
+        }
+    }
+    ifStatements.push_back(ifState);
+}
+    else{
+        while (1) {
+        ifStatement* lastIf = this->getLastifState();
+        std::getline(_inputFile, line);
+            std::size_t foundbracket = line.find("}");
+            if (foundbracket!=std::string::npos){
+                break;
+            }
+        lastIf->setInElse(line);
+        lastIf->setElseStatement();
+        }
+    }
+}
+
+
 
 void Output::getInputs(std::string line) {
 	std::string word;
@@ -159,7 +229,7 @@ void Output::parseInstruction(std::string line) {
 	std::vector<std::string> variables;
 
 	while (iss >> word) {
-		if (counter == 0) {
+         if (counter == 0) {
 			if (checkOutputs(word) != false) {
 				reg = word;
 			}
@@ -509,4 +579,5 @@ std::string Output::getSizes() {
 	}
 	return output;
 }
+
 
