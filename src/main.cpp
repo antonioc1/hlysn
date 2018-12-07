@@ -6,18 +6,17 @@
 int main(int argc, char *argv[]) {
 
 	if (argc != 4) {
-		std::cout << "Usage: dpgen netlistFile verilogFile";
+		std::cout << "Usage: hlsyn cFile latency verilogFile";
 	}
     
-    int latency = std::stoi(argv[2]);
-    HLSM highlevel(argv[1], argv[3], latency);
-    Output dpgen(argv[1], argv[3], latency);
-    dpgen.ReadFromFile();
+    HLSM highlevel(argv[1], argv[3], argv[2]);
+	Output hlysn (argv[1], argv[3], argv[2]);
+    hlysn.ReadFromFile();
    // dpgen.printInstructionsToFile();
     // create States here
     // list r here
     
-    highlevel.printStates(&dpgen);
+    highlevel.printStates(&hlysn);
     
 
     return 0;

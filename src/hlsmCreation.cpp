@@ -17,7 +17,7 @@ void HLSM::printStates(Output *dpgen){
         
         exit(EXIT_FAILURE);
     }
-    int bitNumforState = int(log2(latCon)+1);;
+    int bitNumforState = int(log2(int(latCon))+1);;
     
     _outputFile << "`timescale 1ns / 1ps \n\n\n\n";
     _outputFile << "module HLSM (Clk, Rst, Start, Done, ";
@@ -65,7 +65,7 @@ void HLSM::printStates(Output *dpgen){
     _outputFile << "reg ["<< bitNumforState << ":0] state ;\n";
     _outputFile << "parameter stateStart = 0;\n";
     
-    for (int i = 1; i <= latCon; i++) {
+    for (int i = 1; i <= int(latCon); i++) {
         _outputFile << "parameter state_"<< i << "= " << i << ";\n";
     }
     _outputFile << "parameter stateFinish = "<< latCon+1 <<";\n\n";
@@ -97,12 +97,12 @@ void HLSM::printStates(Output *dpgen){
     
     // write generic case creation here
     
-    for (int i = 1; i <= latCon; i++) {
+    for (int i = 1; i <= int(latCon); i++) {
         _outputFile << "state_" << i <<" : begin\n";
         // create function to find which thing to print here
         _outputFile << "Some logic goes here for state "<< i << "\n"; // change to print the statment that comes next according to list_R
         
-        if (i+1 > latCon) {
+        if (i+1 > int(latCon)) {
             _outputFile << "state <= Final ;\n";
         }
         else{
