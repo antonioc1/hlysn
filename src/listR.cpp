@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstring>
 #include <vector>
+#include <algorithm>
 #include "listR.hpp"
 
 using namespace std;
@@ -102,12 +103,13 @@ std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff, int globa
     int j = 0;
     int k = 0; 
     int t = 0;
+    int m = 0;
     int cnt = 0;
     int flag = 0; 
 
     vector<Equation::Equation> sortedEq;
-    vector<Equation::Equation> alapEqList;
-    vector<Equation::Equation> readyList;
+    vector<Equation> alapEqList;
+    vector<Equation> listREq;
     //clear all initiated vectors to prevent pointer issues 
 
     //sort through list and assign latency based on operator
@@ -126,7 +128,7 @@ std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff, int globa
     //set reliance 
     for(i = sortedEq.size(); i > 0; i--){
         for(j = 0; j < sortedEq.size(); j++){//is this right? can't remember if it's < or <=
-            for(k = 0; k < sortedEq[j].getEqInput().size ; k++){
+            for(k = 0; k < sortedEq[j].getEqInput().size(); k++){
                 if(sortedEq[i].getEqOutput() == sortedEq[j].getEqInput()[k]){//does this work?
                     sortedEq[i].pushBackReliance(sortedEq[j].getEqInput()[k]);
                 }        
@@ -192,11 +194,26 @@ std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff, int globa
     for(i = 1; i <= globalLatency; i++){
         //for each variable list, if reliance = null, it's ready to go remove reliance once something has been put on the list. 
         //remember latency (how long each takes) maybe on latency have a "when i = latency time required" remove from reliance lists 
-
-        for(j = 0; j < sortedEq.size(); j++){//set slack of remaining  each time
-            t = sortedEq[j].getALAP() - i;
-
+        for(j = 0; j < sortedEq.size(); j++){//set slack of remaining each time if they're ready
+            if(sortedEq[j].getEqReliance().empty()){
+                t = sortedEq[j].getALAP() - i;
+                sortedEq[j].setSlack(t);
+            }
         }
+
+        //if equation added to sort then remove output from reliance of all other items
+        for(j = 0; j < sortedEq.size(); j++){
+            for(k = 0; k < listREq.size(); k++){
+                for(m = 0; m < sortedEq[j].getEqReliance().size(); m++){
+                        vector<int>::iterator position = find(sortedEq[j].)
+
+                }
+            }
+        }
+
+
+
+
 
     }
 
