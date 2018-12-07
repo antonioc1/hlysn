@@ -26,13 +26,13 @@ using namespace std;
 
 class HLSM{
 private:
-    char* latCon;
+    int latCon;
     char *_filename, *_filename2;
     std::ifstream _inputFile;
     std::ofstream _outputFile;
     
 public:
-    HLSM(char *filename, char *filename2, char* latency) : latCon(latency), _filename(filename), _filename2(filename2){};
+    HLSM(char *filename, char *filename2, int latency) : _filename(filename), _filename2(filename2), latCon(latency) {};
     void printStates(Output *dpgen);
     
 };

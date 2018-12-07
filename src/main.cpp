@@ -9,8 +9,10 @@ int main(int argc, char *argv[]) {
 		std::cout << "Usage: hlsyn cFile latency verilogFile";
 	}
     
-    HLSM highlevel(argv[1], argv[3], argv[2]);
-	Output hlysn (argv[1], argv[3], argv[2]);
+	int x = atoi(argv[2]);
+
+    HLSM highlevel(argv[1], argv[3], x);
+	Output hlysn (argv[1], argv[3], x);
     hlysn.ReadFromFile();
    // dpgen.printInstructionsToFile();
     // create States here

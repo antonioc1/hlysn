@@ -23,13 +23,13 @@ private:
 	char *_filename, *_filename2;
 	std::ifstream _inputFile;
 	std::ofstream _outputFile;
-	char *_latency;
+	int _latency;
     std::vector<ifStatement*> ifStatements;
     
     
 public:
 	Output() {};
-    Output(char *filename, char *filename2, char *latency) : _filename(filename), _filename2(filename2), _latency(latency) {};
+    Output(char *filename, char *filename2, int latency) : _filename(filename), _filename2(filename2), _latency(latency) {};
 	void ReadFromFile();
 	void getInputs(std::string line);
 	void getOutputs(std::string line);
