@@ -27,6 +27,7 @@ private:
 	int _latency;
     std::vector<ifStatement*> ifStatements;
 	std::vector<Equation*> equations;
+	std::vector<Equation*> listRDone;
     
 public:
 	Output() {};
@@ -50,6 +51,7 @@ public:
     std::vector<Input*> getinputs(){return inputs;}
     void createIfStatement(std::string line);
 	void createEquations();
+	std::vector<Equation*> listRSort(std::vector<Equation*> inputStuff, int globalLatency);
     ifStatement* getLastifState(){return ifStatements.back();}
     
 };
