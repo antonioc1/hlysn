@@ -4,15 +4,17 @@
 #include <iostream>
 #include <cstring>
 #include <vector>
+#include <algorithm>
 #include "listR.hpp"
 
 using namespace std;
 
-Equation::Equation(int iD, int latency, int lap, int lack, std::string operate, std::vector<std::string> input, std::vector<std::string> reliance, int relianceSize){
+Equation::Equation(int iD, int latency, int lap, int lack, std::string out, std::string operate, std::vector<std::string> input, std::vector<std::string> reliance, int relianceSize){
     this->iD = iD;
     this->eqLatency = latency;
     this->aLAP = lap;
     this->slack = lack;
+    this->eqOutput = out; 
     this->eqOperator = operate;
     this->eqInput = input;
     this->eqReliance = reliance;
@@ -97,21 +99,28 @@ void Equation::setEqRelianceSize(int newRSize){
     this->eqRelianceSize = newRSize;
 }
 
-std::vector<Equation> listRSort(vector<Equation> inputStuff, int globalLatency){
+std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff, int globalLatency){
     int i = 0;
     int j = 0;
     int k = 0; 
     int t = 0;
+    int m = 0;
     int cnt = 0;
     int flag = 0; 
+    vector<string> op;
 
-    vector<Equation> sortedEq;
+    vector<Equation::Equation> sortedEq;
     vector<Equation> alapEqList;
-    vector<Equation> readyList;
+    vector<Equation> listREq;
     //clear all initiated vectors to prevent pointer issues 
 
+    //set node ID cause why not?
+    for(i = 1; i <= sortedEq.size(); i++){
+        sortedEq[i].setID(i);
+    }
+
     //sort through list and assign latency based on operator
-    for(i ; i<= sortedEq.size(); i++){
+    for(i = 0; i < sortedEq.size(); i++){
         if(sortedEq[i].getEqOperator() == "*"){ //if given equation is multiplication 
             sortedEq[i].setEqLatency(2);
         }
@@ -126,7 +135,7 @@ std::vector<Equation> listRSort(vector<Equation> inputStuff, int globalLatency){
     //set reliance 
     for(i = sortedEq.size(); i > 0; i--){
         for(j = 0; j < sortedEq.size(); j++){//is this right? can't remember if it's < or <=
-            for(k = 0; k < sortedEq[j].getEqInput().size() ; k++){
+            for(k = 0; k < sortedEq[j].getEqInput().size(); k++){
                 if(sortedEq[i].getEqOutput() == sortedEq[j].getEqInput()[k]){//does this work?
                     sortedEq[i].pushBackReliance(sortedEq[j].getEqInput()[k]);
                 }        
@@ -182,6 +191,7 @@ std::vector<Equation> listRSort(vector<Equation> inputStuff, int globalLatency){
     //if global latency request < cnt, send error message about latency
     if(globalLatency > cnt){
         cout << "Latency requested is not achievable with this netlist";
+        exit(EXIT_FAILURE);
     }
 
     //Start ALAP to List-R------------------------------------------------------------------------------------------------------------
@@ -190,13 +200,50 @@ std::vector<Equation> listRSort(vector<Equation> inputStuff, int globalLatency){
     }
 
     for(i = 1; i <= globalLatency; i++){
-        //for each variable list, if reliance = null, it's ready to go remove reliance once something has been put on the list. 
+        //for each variable list, if reliance = null it's ready to go, remove reliance once something has been put on the list. 
         //remember latency (how long each takes) maybe on latency have a "when i = latency time required" remove from reliance lists 
-
-        for(j = 0; j < sortedEq.size(); j++){//set slack of remaining  each time
-            t = sortedEq[j].getALAP() - i;
-
+        for(j = 0; j < sortedEq.size(); j++){//set slack of remaining each time if they're ready
+            if(sortedEq[j].getEqReliance().empty()){
+                t = sortedEq[j].getALAP() - i;
+                sortedEq[j].setSlack(t);
+            }
         }
+        t = 0; 
+        m = 0;
+        //find the lowest slack
+        for(j=0; j < sortedEq.size(); j++){
+            if(j=0)t = sortedEq[j].getSlack();
+            else{
+                m = sortedEq[j].getSlack();
+                if(m < t) t = m; 
+            }
+        }
+
+        //implement
+        for(j = 0; j < sortedEq.size(); j++){
+            if(sortedEq[j].getSlack() == t){    //if the slack is right
+                if(op.empty()){//remember to clear each time
+                    
+                }
+            }
+        }
+
+
+        //if equation added to final sort then remove output from reliance of all other items
+        for(j = 0; j < sortedEq.size(); j++){
+            for(k = 0; k < listREq.size(); k++){
+                for(m = 0; m < sortedEq[j].getEqReliance().size(); m++){
+                    auto position = find(sortedEq[j].getEqReliance().begin(), sortedEq[j].getEqReliance().end(), listREq[k].getEqOutput());
+                    if(position != sortedEq[j].getEqReliance().end()){
+                        sortedEq[j].getEqReliance().erase(position);
+                    }
+                }
+            }
+        }
+        //if this doesn't work, check antonio's code for finding in an object 
+
+
+
 
     }
 
