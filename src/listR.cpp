@@ -19,6 +19,7 @@ Equation::Equation(int iD, int latency, int lap, int lack, std::string out, std:
     this->eqInput = input;
     this->eqReliance = reliance;
     this->eqRelianceSize = relianceSize;
+    this->sortedFlag = false; 
 }
 
 //getters
@@ -56,6 +57,10 @@ std::vector<std::string> Equation::getEqReliance(){
 
 int Equation::getEqRelianceSize(){
     return this->eqRelianceSize;
+}
+
+int Equation::getSortedFlag(){
+    return this->sortedFlag;
 }
 
 //setters
@@ -99,6 +104,10 @@ void Equation::setEqRelianceSize(int newRSize){
     this->eqRelianceSize = newRSize;
 }
 
+void Equation::setSortedFlag(bool sflag){
+    this->sortedFlag = sflag;
+}
+
 std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff, int globalLatency){
     int i = 0;
     int j = 0;
@@ -107,12 +116,17 @@ std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff, int globa
     int m = 0;
     int cnt = 0;
     int flag = 0; 
-    vector<string> op;
+    vector<int> opLat;
 
     vector<Equation::Equation> sortedEq;
     vector<Equation> alapEqList;
     vector<Equation> listREq;
+
     //clear all initiated vectors to prevent pointer issues 
+    opLat.clear();
+    sortedEq.clear();
+    alapEqList.clear();
+    listREq.clear();
 
     //set node ID cause why not?
     for(i = 1; i <= sortedEq.size(); i++){
@@ -220,16 +234,32 @@ std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff, int globa
         }
 
         //implement
+        flag = 0; 
         for(j = 0; j < sortedEq.size(); j++){
             if(sortedEq[j].getSlack() == t){    //if the slack is right
-                if(op.empty()){//remember to clear each time
-                    
+                if(opLat.empty()){//remember to clear each time
+                    sortedEq[j].setALAP(i);
+                    listREq.push_back(sortedEq[j]);
+                    sortedEq[j].setSortedFlag(true);
+                }
+                else{
+                    for(k = 0; k < listREq.size(); k++){
+                        if(listREq[k].getALAP() == i){ //only check the items already sorted in this time scale
+                            if(sortedEq[j].getEqLatency() == listREq[k].getEqLatency()){
+                                flag++;
+                            }
+                        }
+                    }
+                    if(flag == 0){
+                        sortedEq[j].setALAP(i);
+                        listREq.push_back(sortedEq[j]);
+                        sortedEq[j].setSortedFlag(true);
+                    }
                 }
             }
         }
+        //figure out when to remove sorted thing 
 
-
-        //if equation added to final sort then remove output from reliance of all other items
         for(j = 0; j < sortedEq.size(); j++){
             for(k = 0; k < listREq.size(); k++){
                 for(m = 0; m < sortedEq[j].getEqReliance().size(); m++){
@@ -242,12 +272,14 @@ std::vector<Equation::Equation> listRSort(vector<Equation> inputStuff, int globa
         }
         //if this doesn't work, check antonio's code for finding in an object 
 
-
-
-
+        for(j = 0; j < sortedEq.size(); j++){
+            if(sortedEq[j].getSortedFlag() == true){
+                sortedEq.erase(sortedEq.begin() + j);
+            }
+        }
     }
 
-    return sortedEq;
+    return listREq;
 }
 
 

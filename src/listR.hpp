@@ -23,8 +23,9 @@ class Equation {
         std::vector<std::string> eqInput;
         std::vector<std::string> eqReliance;
         int eqRelianceSize; 
+        bool sortedFlag;
     public:
-        Equation(int iD, int latency, int lap, int lack, std::string operate, std::vector<std::string> input, std::vector<std::string> reliance, int relianceSize);
+        Equation(int iD, int latency, int lap, int lack, std::string out, std::string operate, std::vector<std::string> input, std::vector<std::string> reliance, int relianceSize, bool sortedFlag);
         //getters
         int getID();
         int getEqLatency();
