@@ -14,6 +14,7 @@ int main(int argc, char *argv[]) {
     HLSM highlevel(argv[1], argv[3], x);
 	Output hlysn (argv[1], argv[3], x);
     hlysn.ReadFromFile();
+	hlysn.createEquations();
    // dpgen.printInstructionsToFile();
     // create States here
     // list r here

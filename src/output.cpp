@@ -108,8 +108,6 @@ void Output::createIfStatement(std::string line){
     }
 }
 
-
-
 void Output::getInputs(std::string line) {
 	std::string word;
 	line.erase(std::remove(line.begin(), line.end(), ','), line.end());
@@ -305,6 +303,15 @@ void Output::parseInstruction(std::string line) {
 	Instruction* instruct = NULL;
 	instruct = new Instruction(reg, expression, variables);
 	instructions.push_back(instruct);
+}
+
+void Output::createEquations() {
+	for (Instruction* i : instructions) {
+		Equation* equation = NULL;
+		std::vector<std::string> emp;
+		equation = new Equation(0, 0, 0, 0, i->getReg(), i->getExpression(), i->getVariables(), emp, 0);
+		equations.push_back(equation);
+	}
 }
 
 bool Output::checkOutputs(std::string line) {

@@ -14,6 +14,7 @@
 #include "instruction.hpp"
 #include "input.hpp"
 #include "ifStatement.hpp"
+#include "listR.hpp"
 
 class Output {
 private:
@@ -25,7 +26,7 @@ private:
 	std::ofstream _outputFile;
 	int _latency;
     std::vector<ifStatement*> ifStatements;
-    
+	std::vector<Equation*> equations;
     
 public:
 	Output() {};
@@ -48,6 +49,7 @@ public:
 	std::string getSizes();
     std::vector<Input*> getinputs(){return inputs;}
     void createIfStatement(std::string line);
+	void createEquations();
     ifStatement* getLastifState(){return ifStatements.back();}
     
 };
