@@ -1,15 +1,34 @@
 # Author: Alec Foster, Antonio Cervantes, Colter Ogden
 # NetID: sirslush, antonioc1, jcogden
 # Date: 11/4/2018
-# Project 3
+# Project 2
 
-cmake_minimum_required(VERSION 3.1)
+# Check if windows file 
 
-# Define the project name. 
+	if(MSVC)
 
-project (hlysn)
+# Sets the compilation flags to report warnings through Level 4.
 
-# Add a subdirectory to the project. The CMakeLists.txt file in that subdirectory
-# will be used for further setting up the project.
+		set( CMAKE_CXX_FLAGS "-W4" )
+    		set(CMAKE_DEBUG_POSTFIX "d")
+    		add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
+    		add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
+	else()
+# debug information for all other OSs
 
-add_subdirectory( src )
+   		add_definitions(-Wall -g)
+    		link_libraries(m)
+	endif()
+
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+if(COMPILER_SUPPORTS_CXX11)
+message(STATUS "${COMPILER_SUPPORTS_CXX11}")
+else(COMPILER_SUPPORTS_CXX11)
+message(FATAL_ERROR "${COMPILER_SUPPORTS_CXX11}")
+endif(COMPILER_SUPPORTS_CXX11)
+
+set(CMAKE_CXX_FLAGS "-std=c++11")
+file( GLOB SRCS *.cpp *.h )
+
+add_executable( hlysn ${SRCS} )
