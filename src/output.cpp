@@ -1,4 +1,5 @@
 #include "output.hpp"
+#include<algorithm>
 
 void Output::ReadFromFile(){
 	std::string line;
@@ -309,7 +310,7 @@ void Output::createEquations() {
 	for (Instruction* i : instructions) {
 		Equation* equation = NULL;
 		std::vector<std::string> emp;
-		equation = new Equation(0, 0, 0, 0, i->getReg(), i->getExpression(), i->getVariables(), emp, 0, false);
+		equation = new Equation(0, 0, 0, 800, i->getReg(), i->getExpression(), i->getVariables(), emp, 0, false);
 		equations.push_back(equation);
 	}
 	listRDone = listRSort(equations, _latency);
@@ -325,7 +326,9 @@ std::vector<Equation*> Output::listRSort(std::vector<Equation*> inputStuff, int 
 	int flag = 0;
 	int flagLat2 = 0;
 	int flagLat3 = 0;
+    bool testFlag = false;
 	std::vector<int> opLat;
+    std::vector<std::string> dumb;
 
 	std::vector<Equation*> sortedEq;
 	std::vector<Equation*> alapEqList;
@@ -336,6 +339,7 @@ std::vector<Equation*> Output::listRSort(std::vector<Equation*> inputStuff, int 
 	sortedEq.clear();
 	alapEqList.clear();
 	listREq.clear();
+    dumb.clear();
 
 	sortedEq = inputStuff;
 
@@ -382,58 +386,66 @@ std::vector<Equation*> Output::listRSort(std::vector<Equation*> inputStuff, int 
 
 	//ALAP Sort ------------------------------------------------------------------------------------------------------------
 	for (i = sortedEq.size(); i > 0; i--) {
-		if (i == sortedEq.size()) {//condition for first equation 
+    //for(i = 1; i <= sortedEq.size(); i++){
+        if (i == sortedEq.size()) {//condition for first equation
 			t = 1;
-			sortedEq[i]->setALAP(t);
-			alapEqList.push_back(sortedEq[i]);
+			sortedEq[i-1]->setALAP(t);
+			alapEqList.push_back(sortedEq[i-1]);
 		}
 		else {
-			/*
+            /*m = alapEqList.size();
+            for (j = (alapEqList.size()-1); j >= 0; j--){//for all items in the already sorted list
+                for (k = 0; k < alapEqList[j]->getEqInput().size(); k++) { //for all inputs of those items
+                    if (sortedEq[i-1]->getEqOutput() == alapEqList[j]->getEqInput().at(k)){//if the output of this eq is the input of that eq
+                        t = alapEqList[j]->getALAP() + sortedEq[i-1]->getEqLatency();
+                        sortedEq[i-1]->setALAP(t);
+                        alapEqList.push_back(sortedEq[i-1]);
+                    }
+                }
+            }
+            if(m == alapEqList.size()){
+                t = 1;
+                sortedEq[i-1]->setALAP(t);
+                alapEqList.push_back(sortedEq[i-1]);
+            }
+        }*/
+            
+            
 			//if equation is in reliance array of already sorted equations update alap
 			for (j = 0; j < alapEqList.size(); j++) {//go through already sorted equations
 				for (k = 0; k < alapEqList[j]->getEqInput().size(); k++) { //check each equations inputs
-					if (sortedEq[i]->getEqOutput() == alapEqList[j]->getEqInput()[k]) { //if the output of the current eqation is an input of a lower equation
-						if (flag > 0); //check if the flag was previously set
-						else {
+					if (sortedEq[i-1]->getEqOutput() == alapEqList[j]->getEqInput().at(k)) { //if the output of the current eqation is an input of a lower equation
+                        //if (testFlag == true){ //check if the flag was previously set
+                        //}
+						//else {
 							flag = j; //otherwise mark the flag to reference for the new alap of the current eq
-						}
+                            testFlag = true;
+						//}
 					}
 				}
-			}
-			*/
-			int x = 0;
-			for (Equation* j : alapEqList) {
-				for (std::string k : j->getEqInput()) {
-					if (sortedEq[i]->getEqOutput() == k) {
-						if (flag > 0);
-						else {
-							flag = x;
-						}
-					}
-				}
-				x++;
 			}
 
-			if (flag == 0) { //if no reliance is found then put eq in lowest level
+			if (testFlag == false) { //if no reliance is found then put eq in lowest level
 				t = 1;
-				sortedEq[i]->setALAP(t);
-				alapEqList.push_back(sortedEq[i]);
+				sortedEq[i-1]->setALAP(t);
+				alapEqList.push_back(sortedEq[i-1]);
 			}
 			else {
-				t = alapEqList[j]->getALAP() + sortedEq[i]->getEqLatency(); //take the time of the reliant node and the latency of the current node to find it's time
-				sortedEq[i]->setEqLatency(t);
-				alapEqList.push_back(sortedEq[i]);
+				t = alapEqList[flag]->getALAP() + sortedEq[i-1]->getEqLatency(); //take the time of the reliant node and the latency of the current node to find it's time
+				sortedEq[i-1]->setALAP(t);
+				alapEqList.push_back(sortedEq[i-1]);
 				if (t > cnt) {
 					cnt = t; //updating the largest depth
 				}
 			}
 		}
 		flag = 0;
-	}
+        testFlag = false;
+}
 
 	sortedEq = alapEqList;
 	//then clear the alapEqList; 
-
+    t = 0;
 	for (i = 0; i < sortedEq.size(); i++) { //set alap in the right latency order
 		t = sortedEq[i]->getALAP() - 1;
 		sortedEq[i]->setALAP((cnt - t));
@@ -441,7 +453,7 @@ std::vector<Equation*> Output::listRSort(std::vector<Equation*> inputStuff, int 
 	//alap portion of ListR completed------------------------------------------------------------------------------------------------------------
 
 	//if global latency request < cnt, send error message about latency
-	if (globalLatency > cnt) {
+	if (cnt > globalLatency) {
 		std::cout << "Latency requested is not achievable with this netlist";
 		exit(EXIT_FAILURE);
 	}
@@ -455,7 +467,7 @@ std::vector<Equation*> Output::listRSort(std::vector<Equation*> inputStuff, int 
 		//for each variable list, if reliance = null it's ready to go, remove reliance once something has been put on the list. 
 		//remember latency (how long each takes) maybe on latency have a "when i = latency time required" remove from reliance lists 
 		for (j = 0; j < sortedEq.size(); j++) {//set slack of remaining each time if they're ready
-			if (sortedEq[j]->getEqReliance().empty()) {
+			if (sortedEq[j]->getEqReliance().size() == 0) {
 				t = sortedEq[j]->getALAP() - i;
 				sortedEq[j]->setSlack(t);
 			}
@@ -464,7 +476,7 @@ std::vector<Equation*> Output::listRSort(std::vector<Equation*> inputStuff, int 
 		m = 0;
 		//find the lowest slack
 		for (j = 0; j < sortedEq.size(); j++) {
-			if (j = 0)t = sortedEq[j]->getSlack();
+			if (j == 0) t = sortedEq[j]->getSlack();
 			else {
 				m = sortedEq[j]->getSlack();
 				if (m < t) t = m;
@@ -505,16 +517,22 @@ std::vector<Equation*> Output::listRSort(std::vector<Equation*> inputStuff, int 
 						sortedEq[j]->setSortedFlag(true);
 					}
 				}
+                flag = 0;
 			}
 		}
 
 		for (j = 0; j < sortedEq.size(); j++) {
 			for (k = 0; k < listREq.size(); k++) {
 				for (m = 0; m < sortedEq[j]->getEqReliance().size(); m++) {
-					auto position = find(sortedEq[j]->getEqReliance().begin(), sortedEq[j]->getEqReliance().end(), listREq[k]->getEqOutput());
-					if (position != sortedEq[j]->getEqReliance().end()) {
-						sortedEq[j]->getEqReliance().erase(position);
-					}
+                    if(listREq[k]->getEqOutput() == sortedEq[j]->getEqReliance()[m]){
+                        for(int n = 0; n < sortedEq[j]->getEqReliance().size(); n++){
+                            if(listREq[k]->getEqOutput() != sortedEq[j]->getEqReliance()[n]){
+                                dumb.push_back(sortedEq[j]->getEqReliance()[n]);
+                            }
+                        }
+                        sortedEq[j]->setEqReliance(dumb);
+                    }
+                    dumb.clear();
 				}
 			}
 		}
@@ -528,7 +546,12 @@ std::vector<Equation*> Output::listRSort(std::vector<Equation*> inputStuff, int 
 		flagLat3--;
 		flagLat2--;
 	}
-
+    
+    if(sortedEq.size() != 0){
+        std::cout << "Latency requested is not achievable with this netlist";
+        exit(EXIT_FAILURE);
+    }
+    
 	return listREq;
 }
 
