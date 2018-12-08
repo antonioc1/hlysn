@@ -53,7 +53,7 @@ public:
 	void createEquations();
 	std::vector<Equation*> listRSort(std::vector<Equation*> inputStuff, int globalLatency);
     ifStatement* getLastifState(){return ifStatements.back();}
-    
+	std::vector<Equation*> getListRDone();
 };
 
 

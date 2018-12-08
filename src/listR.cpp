@@ -102,6 +102,11 @@ void Equation::setEqRelianceSize(int newRSize) {
 	this->eqRelianceSize = newRSize;
 }
 
+void Equation::clearReliance()
+{
+	this->eqReliance.clear();
+}
+
 void Equation::setSortedFlag(bool sflag) {
 	this->sortedFlag = sflag;
 }

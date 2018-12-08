@@ -48,6 +48,7 @@ public:
 	void setEqInput(std::vector<std::string> newInput);
 	void setEqReliance(std::vector<std::string> newReliance);
 	void setEqRelianceSize(int newRSize);
+	void clearReliance();
 
 	void Equation::pushBackReliance(std::string r);
 

@@ -1,7 +1,7 @@
 #include "output.hpp"
 #include<algorithm>
 
-void Output::ReadFromFile(){
+void Output::ReadFromFile() {
 	std::string line;
 	std::string word;
 	if (_filename != NULL) {
@@ -26,87 +26,87 @@ void Output::ReadFromFile(){
 					else if (word == "variable") {
 						getVariablesVar(line);
 					}
-                    else if (word == "if") {
-                        createIfStatement(line); //Fix
-                        
-                        
-                    }
-                    else if (word == "else") {
-                        createIfStatement(line); //Fix
-                        
-                        
-                    }
+					else if (word == "if") {
+						createIfStatement(line); //Fix
+
+
+					}
+					else if (word == "else") {
+						createIfStatement(line); //Fix
+
+
+					}
 					else {
 						parseInstruction(line);
 					}
 				}
 			}
 		}
-        else {
-            std::cout << _filename << "\n";
-            std::cout << "input file not found";
-            exit(EXIT_FAILURE);
-        }
+		else {
+			std::cout << _filename << "\n";
+			std::cout << "input file not found";
+			exit(EXIT_FAILURE);
+		}
 	}
-	
+
 }
 
-void Output::createIfStatement(std::string line){
-    std::size_t foundif = line.find("if");
-    if (foundif!=std::string::npos) {
-        
-    
-    ifStatement* ifState = new ifStatement();
-    line.erase(std::remove(line.begin(), line.end(), '{'), line.end());
-    ifState->setCondition(line);
-    std::getline(_inputFile, line);
-    while (1) {
-        std::size_t foundif = line.find("if");
-        std::size_t foundelse = line.find("else");
-        std::size_t foundbracket = line.find("}");
-        if (foundif!=std::string::npos){
-            line.erase(std::remove(line.begin(), line.end(), '\t'), line.end());
-            std::cout << "nested if\n";
-            createIfStatement(line);
-            ifStatement* last = this->getLastifState();
-            ifState->setNestedIf(last);
-            std::getline(_inputFile, line);
-        }
-        else if (foundelse!=std::string::npos) {
-            ifStatement* lastIf = this->getLastifState();
-            std::getline(_inputFile, line);
-            lastIf->setInElse(line);
-            lastIf->setElseStatement();
-            std::getline(_inputFile, line);
-        }
-        else if (foundbracket!=std::string::npos){
-//            std::getline(_inputFile, line);
-//            std::size_t foundelse = line.find("else");
-//            if (foundelse!=std::string::npos) {
-//                ifState->setInElse(line);
-//            }
-                break;
-        }
-        else{
-            line.erase(std::remove(line.begin(), line.end(), '\t'), line.end());
-            ifState->setInIf(line);
-            std::getline(_inputFile, line);
-        }
-    }
-    ifStatements.push_back(ifState);
-}
-    else{
-        while (1) {
-        ifStatement* lastIf = this->getLastifState();
-        std::getline(_inputFile, line);
-            std::size_t foundbracket = line.find("}");
-            if (foundbracket!=std::string::npos){
-                break;
-            }
-        lastIf->setInElse(line);
-        lastIf->setElseStatement();
-        }
-    }
+void Output::createIfStatement(std::string line) {
+	std::size_t foundif = line.find("if");
+	if (foundif != std::string::npos) {
+
+
+		ifStatement* ifState = new ifStatement();
+		line.erase(std::remove(line.begin(), line.end(), '{'), line.end());
+		ifState->setCondition(line);
+		std::getline(_inputFile, line);
+		while (1) {
+			std::size_t foundif = line.find("if");
+			std::size_t foundelse = line.find("else");
+			std::size_t foundbracket = line.find("}");
+			if (foundif != std::string::npos) {
+				line.erase(std::remove(line.begin(), line.end(), '\t'), line.end());
+				std::cout << "nested if\n";
+				createIfStatement(line);
+				ifStatement* last = this->getLastifState();
+				ifState->setNestedIf(last);
+				std::getline(_inputFile, line);
+			}
+			else if (foundelse != std::string::npos) {
+				ifStatement* lastIf = this->getLastifState();
+				std::getline(_inputFile, line);
+				lastIf->setInElse(line);
+				lastIf->setElseStatement();
+				std::getline(_inputFile, line);
+			}
+			else if (foundbracket != std::string::npos) {
+				//            std::getline(_inputFile, line);
+				//            std::size_t foundelse = line.find("else");
+				//            if (foundelse!=std::string::npos) {
+				//                ifState->setInElse(line);
+				//            }
+				break;
+			}
+			else {
+				line.erase(std::remove(line.begin(), line.end(), '\t'), line.end());
+				ifState->setInIf(line);
+				std::getline(_inputFile, line);
+			}
+		}
+		ifStatements.push_back(ifState);
+	}
+	else {
+		while (1) {
+			ifStatement* lastIf = this->getLastifState();
+			std::getline(_inputFile, line);
+			std::size_t foundbracket = line.find("}");
+			if (foundbracket != std::string::npos) {
+				break;
+			}
+			lastIf->setInElse(line);
+			lastIf->setElseStatement();
+		}
+	}
 }
 
 void Output::getInputs(std::string line) {
@@ -215,7 +215,7 @@ void Output::getVariablesVar(std::string line) {
 		counter++;
 	}
 	Input* input = NULL;
-	input = new Input("variable", size, variables);
+	input = new Input("reg", size, variables);
 	inputs.push_back(input);
 }
 
@@ -228,7 +228,7 @@ void Output::parseInstruction(std::string line) {
 	std::vector<std::string> variables;
 
 	while (iss >> word) {
-         if (counter == 0) {
+		if (counter == 0) {
 			if (checkOutputs(word) != false) {
 				reg = word;
 			}
@@ -252,21 +252,21 @@ void Output::parseInstruction(std::string line) {
 			else if (counter == 3) {
 				if (checkExpression(word) != false) {
 					expression = word;
-//                    if (word == ">") {
-//                        std::size_t found = line.find(">");
-//                        if (found!=std::string::npos)
-//                            std::cout << "create reg for > " << found << '\n';
-//                    }
-//                    else if (word == "<") {
-//                        std::size_t found = line.find("<");
-//                        if (found!=std::string::npos)
-//                            std::cout << "create reg for < " << found << '\n';
-//                    }
-//                    else if (word == "=") {
-//                        std::size_t found = line.find("=");
-//                        if (found!=std::string::npos)
-//                            std::cout << "create reg for = " << found << '\n';
-//                    }
+					//                    if (word == ">") {
+					//                        std::size_t found = line.find(">");
+					//                        if (found!=std::string::npos)
+					//                            std::cout << "create reg for > " << found << '\n';
+					//                    }
+					//                    else if (word == "<") {
+					//                        std::size_t found = line.find("<");
+					//                        if (found!=std::string::npos)
+					//                            std::cout << "create reg for < " << found << '\n';
+					//                    }
+					//                    else if (word == "=") {
+					//                        std::size_t found = line.find("=");
+					//                        if (found!=std::string::npos)
+					//                            std::cout << "create reg for = " << found << '\n';
+					//                    }
 				}
 				else {
 					//error: expression not found
@@ -326,9 +326,9 @@ std::vector<Equation*> Output::listRSort(std::vector<Equation*> inputStuff, int 
 	int flag = 0;
 	int flagLat2 = 0;
 	int flagLat3 = 0;
-    bool testFlag = false;
+	bool testFlag = false;
 	std::vector<int> opLat;
-    std::vector<std::string> dumb;
+	std::vector<std::string> dumb;
 
 	std::vector<Equation*> sortedEq;
 	std::vector<Equation*> alapEqList;
@@ -339,7 +339,7 @@ std::vector<Equation*> Output::listRSort(std::vector<Equation*> inputStuff, int 
 	sortedEq.clear();
 	alapEqList.clear();
 	listREq.clear();
-    dumb.clear();
+	dumb.clear();
 
 	sortedEq = inputStuff;
 
@@ -386,40 +386,40 @@ std::vector<Equation*> Output::listRSort(std::vector<Equation*> inputStuff, int 
 
 	//ALAP Sort ------------------------------------------------------------------------------------------------------------
 	for (i = sortedEq.size(); i > 0; i--) {
-    //for(i = 1; i <= sortedEq.size(); i++){
-        if (i == sortedEq.size()) {//condition for first equation
+		//for(i = 1; i <= sortedEq.size(); i++){
+		if (i == sortedEq.size()) {//condition for first equation
 			t = 1;
-			sortedEq[i-1]->setALAP(t);
-			alapEqList.push_back(sortedEq[i-1]);
+			sortedEq[i - 1]->setALAP(t);
+			alapEqList.push_back(sortedEq[i - 1]);
 		}
 		else {
-            /*m = alapEqList.size();
-            for (j = (alapEqList.size()-1); j >= 0; j--){//for all items in the already sorted list
-                for (k = 0; k < alapEqList[j]->getEqInput().size(); k++) { //for all inputs of those items
-                    if (sortedEq[i-1]->getEqOutput() == alapEqList[j]->getEqInput().at(k)){//if the output of this eq is the input of that eq
-                        t = alapEqList[j]->getALAP() + sortedEq[i-1]->getEqLatency();
-                        sortedEq[i-1]->setALAP(t);
-                        alapEqList.push_back(sortedEq[i-1]);
-                    }
-                }
-            }
-            if(m == alapEqList.size()){
-                t = 1;
-                sortedEq[i-1]->setALAP(t);
-                alapEqList.push_back(sortedEq[i-1]);
-            }
-        }*/
-            
-            
-			//if equation is in reliance array of already sorted equations update alap
+			/*m = alapEqList.size();
+			for (j = (alapEqList.size()-1); j >= 0; j--){//for all items in the already sorted list
+				for (k = 0; k < alapEqList[j]->getEqInput().size(); k++) { //for all inputs of those items
+					if (sortedEq[i-1]->getEqOutput() == alapEqList[j]->getEqInput().at(k)){//if the output of this eq is the input of that eq
+						t = alapEqList[j]->getALAP() + sortedEq[i-1]->getEqLatency();
+						sortedEq[i-1]->setALAP(t);
+						alapEqList.push_back(sortedEq[i-1]);
+					}
+				}
+			}
+			if(m == alapEqList.size()){
+				t = 1;
+				sortedEq[i-1]->setALAP(t);
+				alapEqList.push_back(sortedEq[i-1]);
+			}
+		}*/
+
+
+		//if equation is in reliance array of already sorted equations update alap
 			for (j = 0; j < alapEqList.size(); j++) {//go through already sorted equations
 				for (k = 0; k < alapEqList[j]->getEqInput().size(); k++) { //check each equations inputs
-					if (sortedEq[i-1]->getEqOutput() == alapEqList[j]->getEqInput().at(k)) { //if the output of the current eqation is an input of a lower equation
-                        //if (testFlag == true){ //check if the flag was previously set
-                        //}
+					if (sortedEq[i - 1]->getEqOutput() == alapEqList[j]->getEqInput().at(k)) { //if the output of the current eqation is an input of a lower equation
+						//if (testFlag == true){ //check if the flag was previously set
+						//}
 						//else {
-							flag = j; //otherwise mark the flag to reference for the new alap of the current eq
-                            testFlag = true;
+						flag = j; //otherwise mark the flag to reference for the new alap of the current eq
+						testFlag = true;
 						//}
 					}
 				}
@@ -427,25 +427,25 @@ std::vector<Equation*> Output::listRSort(std::vector<Equation*> inputStuff, int 
 
 			if (testFlag == false) { //if no reliance is found then put eq in lowest level
 				t = 1;
-				sortedEq[i-1]->setALAP(t);
-				alapEqList.push_back(sortedEq[i-1]);
+				sortedEq[i - 1]->setALAP(t);
+				alapEqList.push_back(sortedEq[i - 1]);
 			}
 			else {
-				t = alapEqList[flag]->getALAP() + sortedEq[i-1]->getEqLatency(); //take the time of the reliant node and the latency of the current node to find it's time
-				sortedEq[i-1]->setALAP(t);
-				alapEqList.push_back(sortedEq[i-1]);
+				t = alapEqList[flag]->getALAP() + sortedEq[i - 1]->getEqLatency(); //take the time of the reliant node and the latency of the current node to find it's time
+				sortedEq[i - 1]->setALAP(t);
+				alapEqList.push_back(sortedEq[i - 1]);
 				if (t > cnt) {
 					cnt = t; //updating the largest depth
 				}
 			}
 		}
 		flag = 0;
-        testFlag = false;
-}
+		testFlag = false;
+	}
 
 	sortedEq = alapEqList;
 	//then clear the alapEqList; 
-    t = 0;
+	t = 0;
 	for (i = 0; i < sortedEq.size(); i++) { //set alap in the right latency order
 		t = sortedEq[i]->getALAP() - 1;
 		sortedEq[i]->setALAP((cnt - t));
@@ -517,22 +517,22 @@ std::vector<Equation*> Output::listRSort(std::vector<Equation*> inputStuff, int 
 						sortedEq[j]->setSortedFlag(true);
 					}
 				}
-                flag = 0;
+				flag = 0;
 			}
 		}
 
 		for (j = 0; j < sortedEq.size(); j++) {
 			for (k = 0; k < listREq.size(); k++) {
 				for (m = 0; m < sortedEq[j]->getEqReliance().size(); m++) {
-                    if(listREq[k]->getEqOutput() == sortedEq[j]->getEqReliance()[m]){
-                        for(int n = 0; n < sortedEq[j]->getEqReliance().size(); n++){
-                            if(listREq[k]->getEqOutput() != sortedEq[j]->getEqReliance()[n]){
-                                dumb.push_back(sortedEq[j]->getEqReliance()[n]);
-                            }
-                        }
-                        sortedEq[j]->setEqReliance(dumb);
-                    }
-                    dumb.clear();
+					if (listREq[k]->getEqOutput() == sortedEq[j]->getEqReliance()[m]) {
+						for (int n = 0; n < sortedEq[j]->getEqReliance().size(); n++) {
+							if (listREq[k]->getEqOutput() != sortedEq[j]->getEqReliance()[n]) {
+								dumb.push_back(sortedEq[j]->getEqReliance()[n]);
+							}
+						}
+						sortedEq[j]->setEqReliance(dumb);
+					}
+					dumb.clear();
 				}
 			}
 		}
@@ -546,13 +546,18 @@ std::vector<Equation*> Output::listRSort(std::vector<Equation*> inputStuff, int 
 		flagLat3--;
 		flagLat2--;
 	}
-    
-    if(sortedEq.size() != 0){
-        std::cout << "Latency requested is not achievable with this netlist";
-        exit(EXIT_FAILURE);
-    }
-    
+
+	if (sortedEq.size() != 0) {
+		std::cout << "Latency requested is not achievable with this netlist";
+		exit(EXIT_FAILURE);
+	}
+
 	return listREq;
+}
+
+std::vector<Equation*> Output::getListRDone()
+{
+	return this->listRDone;
 }
 
 bool Output::checkOutputs(std::string line) {
@@ -599,10 +604,10 @@ void Output::printInstructionsToFile() {
 	}
 	else {
 		std::cout << "Output file not found";
-		
+
 		exit(EXIT_FAILURE);
 	}
-	
+
 	_outputFile << "`timescale 1ns / 1ps \n";
 	_outputFile << "module HLSM (Clk, Rst, Start, Done, ";
 
@@ -623,7 +628,7 @@ void Output::printInstructionsToFile() {
 
 	_outputFile << "\n";
 	_outputFile << "input Clk, Rst, Start;\n";
-    _outputFile << "output reg Done;\n";
+	_outputFile << "output reg Done;\n";
 
 	for (Input* i : inputs) {
 		std::string size = i->getSize();
@@ -670,7 +675,7 @@ void Output::printInstructionsToFile() {
 		}
 		else if (i->getExpression() == "==") {
 			nums[2]++;
-			_outputFile << line << "COMP #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) comp_" << nums[2] << "(" << getVariables(i) << "0, 0, " <<  i->getReg() << ");\n\n";
+			_outputFile << line << "COMP #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) comp_" << nums[2] << "(" << getVariables(i) << "0, 0, " << i->getReg() << ");\n\n";
 		}
 		else if (i->getExpression() == "<") {
 			nums[2]++;
@@ -678,7 +683,7 @@ void Output::printInstructionsToFile() {
 		}
 		else if (i->getExpression() == ">") {
 			nums[2]++;
-			_outputFile << line << "COMP #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) comp_" << nums[2] << "(" << getVariables(i) << i->getReg() <<", 0, 0);\n\n";
+			_outputFile << line << "COMP #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) comp_" << nums[2] << "(" << getVariables(i) << i->getReg() << ", 0, 0);\n\n";
 		}
 		else if (i->getExpression() == "<<") {
 			nums[3]++;
@@ -701,7 +706,7 @@ void Output::printInstructionsToFile() {
 		}
 		else if (i->getExpression() == "=") {
 			nums[7]++;
-			_outputFile << line << "REG #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) reg_" << nums[7] << "(" << getVariables(i) << "Clk, Rst, " << i->getReg() <<");\n\n";
+			_outputFile << line << "REG #(.DATAWIDTH(" << getDatawidth(i->getReg()) << ")) reg_" << nums[7] << "(" << getVariables(i) << "Clk, Rst, " << i->getReg() << ");\n\n";
 		}
 		else if (i->getExpression() == "/") {
 			nums[8]++;
@@ -737,7 +742,7 @@ std::string Output::getDatawidth(std::string line) {
 				return i->getSize();
 			}
 		}
-		
+
 	}
 	return 0;
 }
@@ -745,7 +750,7 @@ std::string Output::getDatawidth(std::string line) {
 std::string Output::getVariables(Instruction * i) {
 	std::string line = "";
 	std::vector<std::string> variables = i->getVariables();
-	
+
 	for (int j = 0; j < variables.size(); j++) {
 		/*
 		if (j != (variables.size() - 1)) {
@@ -820,12 +825,10 @@ std::string Output::getSizes() {
 			size.erase(0, 3);
 			output = output + "parameter " + currentSizes[i] + " = " + size + ";\n";
 		}
-		else if(line == "UInt") {
+		else if (line == "UInt") {
 			size.erase(0, 4);
 			output = output + "parameter " + currentSizes[i] + " = " + size + ";\n";
 		}
 	}
 	return output;
 }
-
-
